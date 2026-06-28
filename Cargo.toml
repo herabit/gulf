@@ -1,0 +1,143 @@
+[package]
+name = "gulf"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+publish.workspace = true
+
+[workspace]
+resolver = "3"
+members = [
+  "crates/capture",
+  "crates/capture-linux",
+  "crates/core",
+  "crates/list"
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.96"
+description = "A poor set of tools for working with multimedia."
+homepage = "https://github.com/herabit/gulf"
+repository = "https://github.com/herabit/gulf"
+license = "MIT OR Apache-2.0"
+keywords = []
+categories = []
+publish = false
+
+[workspace.dependencies]
+ash = {
+  version = "0.38.0+1.3.281",
+  default-features = false,
+}
+ashpd = {
+  git = "https://github.com/bilelmoussaoui/ashpd.git",
+  rev = "1f195de2a0ca56531a5e79df0682a12e9883a4c9",
+  default-features = false,
+}
+bitflags = {
+  version = "2.13.0",
+  default-features = false,
+}
+bytemuck = {
+  version = "1.25.0",
+  default-features = false,
+}
+bytes = {
+  version = "1.12.0",
+  default-features = false,
+}
+dbus = {
+  version = "0.9.11",
+  default-features = false,
+}
+futures = {
+  version = "0.3.32",
+  default-features = false,
+}
+gpu-allocator = {
+  version = "0.28.0",
+  default-features = false,
+}
+gpu-descriptor = {
+  version = "0.3.2",
+  default-features = false,
+}
+libc = {
+  version = "0.2.186",
+  default-features = false,
+}
+libspa = {
+  version = "0.10.0",
+  default-features = false,
+}
+log = {
+  version = "0.4.33",
+  default-features = false,
+}
+pipewire = {
+  version = "0.10.0",
+  default-features = false,
+}
+proc-macro2 = {
+  version = "1.0.106",
+  default-features = false,
+}
+raw-window-handle = {
+  version = "0.6.2",
+  default-features = false,
+}
+syn = {
+  version = "2.0.118",
+  default-features = false,
+}
+tokio = {
+  version = "1.52.3",
+  default-features = false,
+}
+tokio-stream = {
+  version = "0.1.18",
+  default-features = false,
+}
+tokio-util = {
+  version = "0.7.18",
+  default-features = false,
+}
+tracing = {
+  version = "0.1.44",
+  default-features = false,
+}
+vulkanalia = {
+  version = "0.35.0",
+  default-features = false,
+}
+wgpu = {
+  version = "29.0.3",
+  default-features = false,
+}
+wgpu-hal = {
+  version = "29.0.3",
+  default-features = false,
+}
+windows = {
+  version = "0.62.2",
+  default-features = false,
+}
+winit = {
+  version = "0.30.13",
+  default-features = false,
+}
+
+[workspace.lints]
+
+[dependencies]
+
+[profile.dev]
+opt-level = 3

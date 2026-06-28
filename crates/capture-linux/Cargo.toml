@@ -1,0 +1,41 @@
+[package]
+name = "gulf-capture-linux"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+publish.workspace = true
+
+[dependencies]
+ashpd = {
+  workspace = true,
+  features = ["camera", "pipewire", "screencast", "tokio"],
+}
+gulf-core = {
+  path = "../core/",
+  default-features = true,
+}
+libspa = {
+  workspace = true,
+  features = ["v1_2_0"],
+}
+log = {
+  workspace = true,
+  features = ["std"],
+}
+pipewire = {
+  workspace = true,
+  features = ["v1_2_0"],
+}
+tokio = {
+  workspace = true,
+  features = ["macros", "sync"],
+}
+
+[lints]
+workspace = true

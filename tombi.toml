@@ -1,0 +1,12 @@
+# I am not happy about it, but I am reluctantly using this slop shit because Taplo, as of now,
+# lacks TOML 1.1 support... Something I should take a look at.
+
+toml-version = "v1.1.0"
+
+[schema]
+strict = false
+
+[[schemas]]
+toml-version = "v1.1.0"
+path = "tombi://www.schemastore.org/cargo.json"
+include = ["**/Cargo.toml"]

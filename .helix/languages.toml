@@ -1,0 +1,3 @@
+[language-server.tombi]
+command = "tombi"
+args = ["lsp", "--verbose"]
