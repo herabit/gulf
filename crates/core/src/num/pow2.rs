@@ -157,8 +157,8 @@ impl hash::Hash for PowerOfTwo {
 }
 
 /// Error type indicating that something was not a power-of-two.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct NotPowerOfTwo;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct NotPowerOfTwo(pub(crate) ());
 
 impl fmt::Display for NotPowerOfTwo {
     #[inline]
@@ -172,7 +172,7 @@ impl fmt::Display for NotPowerOfTwo {
 
 impl error::Error for NotPowerOfTwo {
     #[allow(deprecated)]
-    #[inline]
+    #[inline(always)]
     fn description(&self) -> &str {
         "provided value was not a power of two"
     }
@@ -197,14 +197,24 @@ macro_rules! repr {
         }
 
         impl Exponent {
-            const MIN: Exponent = $crate::macros::first![$(Exponent::$variant),+];
-            const MAX: Exponent = $crate::macros::last![$(Exponent::$variant),+];
+            const MIN: Exponent = $crate::macros::first![
+                $( Exponent::$variant ),+
+            ];
+            const MAX: Exponent = $crate::macros::last![
+                $( Exponent::$variant ),+
+            ];
         }
 
         // NOTE: We add this to ensure that the make sure that the `MIN` value is what we expect.
-        const _: () = assert!((Exponent::MIN as u32) == 0, "unexpected power-of-two minimum value");
+        const _: () = assert!(
+            (Exponent::MIN as u32) == 0,
+            "unexpected power-of-two minimum value",
+        );
         // NOTE: We add this to ensure that we have all possible variants.
-        const _: () = assert!((Exponent::MAX as u32).strict_add(1) == u128::BITS, "unexpected power-of-two maximum value");
+        const _: () = assert!(
+            (Exponent::MAX as u32).strict_add(1) == u128::BITS,
+            "unexpected power-of-two maximum value",
+        );
     };
 }
 

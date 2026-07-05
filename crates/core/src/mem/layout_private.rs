@@ -84,20 +84,14 @@ macro_rules! generate {
         },
 
         align: {
-            bounds: $align_min:tt..=$align_max:tt,
-            docs: {
-                $($align_docs:tt)*
-            }
+            bounds: $align_min:tt..=$align_max:tt
             $(,)?
         },
 
         mask: {
             bounds: $mask_min:tt..=$mask_max:tt,
-            docs: {
-                without_hole: $without_hole:tt,
-                with_hole: $with_hole:tt
-                $(,)?
-            }
+            without_hole: $without_hole:tt,
+            with_hole: $with_hole:tt
             $(,)?
         }
 
@@ -105,7 +99,7 @@ macro_rules! generate {
     } => {
         /// This is an "index" into the possible alignments and masks.
         #[repr(u32)]
-        pub(super) enum Index {
+        pub(crate) enum Index {
             $($variant),+
         }
 
@@ -120,17 +114,17 @@ macro_rules! generate {
             ::core::cmp::Eq,
         )]
         #[repr(usize)]
-        pub(super) enum AlignRepr {
+        pub(crate) enum AlignRepr {
             $(
                 $variant = 1_usize.strict_shl(Index::$variant as u32),
             )+
         }
 
         impl AlignRepr {
-            pub(super) const MIN: AlignRepr = $crate::macros::first![
+            pub(crate) const MIN: AlignRepr = $crate::macros::first![
                 $( AlignRepr::$variant ),+
             ];
-            pub(super) const MAX: AlignRepr = $crate::macros::last![
+            pub(crate) const MAX: AlignRepr = $crate::macros::last![
                 $( AlignRepr::$variant ),+
             ];
         }
@@ -146,17 +140,17 @@ macro_rules! generate {
             ::core::cmp::Eq,
         )]
         #[repr(usize)]
-        pub(super) enum MaskRepr {
+        pub(crate) enum MaskRepr {
             $(
                 $variant = !(AlignRepr::$variant as usize).strict_sub(1),
             )+
         }
 
         impl MaskRepr {
-            pub(super) const MIN: MaskRepr = $crate::macros::last![
+            pub(crate) const MIN: MaskRepr = $crate::macros::last![
                 $( MaskRepr::$variant ),+
             ];
-            pub(super) const MAX: MaskRepr = $crate::macros::first![
+            pub(crate) const MAX: MaskRepr = $crate::macros::first![
                 $( MaskRepr::$variant ),+
             ];
         }
@@ -171,19 +165,47 @@ macro_rules! generate {
 
             (align.min) => { $align_min };
             (@align.min) => { ::core::stringify!($align_min) };
+            (align.min.assert) => {
+                ::core::concat!(
+                    "`Align`'s documented minimum value, `",
+                    ::core::stringify!($align_min),
+                    "`, is wrong",
+                )
+            };
 
             (align.max) => { $align_max };
             (@align.max) => { ::core::stringify!($align_max) };
+            (align.max.assert) => {
+                ::core::concat!(
+                    "`Align`'s documented maximum value, `",
+                    ::core::stringify!($align_max),
+                    "`, is wrong",
+                )
+            };
 
             (mask.min) => { $mask_min };
             (@mask.min) => { ::core::stringify!($mask_min) };
+            (mask.min.assert) => {
+                ::core::concat!(
+                    "`Mask`'s documented minimum value, `",
+                    ::core::stringify!($mask_min),
+                    "`, is wrong",
+                )
+            };
 
             (mask.max) => { $mask_max };
             (@mask.max) => { ::core::stringify!($mask_max) };
+            (mask.max.assert) => {
+                ::core::concat!(
+                    "`Mask`'s documented maximum value, `",
+                    ::core::stringify!($mask_max),
+                    "`, is wrong",
+                )
+            };
 
-            (mask.docs.with_hole) => { $with_hole };
-            (@mask.docs.with_hole) => { ::core::stringify!($with_hole) };
-            (mask.docs.with_hole.assert_message) => {
+            (mask.with_hole) => { $with_hole };
+            (@mask.with_hole) => { ::core::stringify!($with_hole) };
+            (mask.with_hole.assert) => {
                 ::core::concat!(
                     "`Mask`'s documented example of a mask with a hole, `",
                     ::core::stringify!($with_hole),
@@ -191,9 +213,9 @@ macro_rules! generate {
                 )
             };
 
-            (mask.docs.without_hole) => { $without_hole };
-            (@mask.docs.without_hole) => { ::core::stringify!($without_hole) };
-            (mask.docs.without_hole.assert_message) => {
+            (mask.without_hole) => { $without_hole };
+            (@mask.without_hole) => { ::core::stringify!($without_hole) };
+            (mask.without_hole.assert) => {
                 ::core::concat!(
                     "`Mask`'s documented example of a mask without a hole, `",
                     ::core::stringify!($without_hole),
@@ -252,105 +274,57 @@ macro_rules! define {
             $($_64_rest:tt)*
         } $(,)?
     } => {
-        // 64-bit platforms
-        #[cfg(target_pointer_width = "16")]
-        $crate::mem::layout::private::generate! {
-            $D;
+        ::core::cfg_select! {
+            target_pointer_width = "16" => {
+                $crate::mem::layout::private::generate! {
+                    $D;
 
-            bits: 16,
-            bits_minus_one: 15,
+                    bits: 16,
+                    bits_minus_one: 15,
 
-            variants: enum {
-                $( $_16, )+
-            },
+                    variants: enum {
+                        $( $_16, )+
+                    },
 
-            $($_16_rest)*
-        }
+                    $($_16_rest)*
+                }
+            }
+            target_pointer_width = "32" => {
+                $crate::mem::layout::private::generate! {
+                    $D;
 
-        //  32-bit platforms
-        #[cfg(target_pointer_width = "32")]
-        $crate::mem::layout::private::generate! {
-            $D;
+                    bits: 32,
+                    bits_minus_one: 31,
 
-            bits: 32,
-            bits_minus_one: 31,
+                    variants: enum {
+                        $( $_16, )+
+                        $( $_32, )+
+                    },
 
-            variants: enum {
-                $( $_16, )+
-                $( $_32, )+
-            },
+                    $($_32_rest)*
+                }
+            }
+            target_pointer_width = "64" => {
+                $crate::mem::layout::private::generate! {
+                    $D;
 
-            $($_32_rest)*
-        }
+                    bits: 64,
+                    bits_minus_one: 63,
 
-        // 64-bit platforms
-        $crate::mem::layout::private::generate! {
-            $D;
+                    variants: enum {
+                        $( $_16, )+
+                        $( $_32, )+
+                        $( $_64, )+
+                    },
 
-            bits: 64,
-            bits_minus_one: 63,
-
-            variants: enum {
-                $( $_16, )+
-                $( $_32, )+
-                $( $_64, )+
-            },
-
-            $($_64_rest)*
+                    $($_64_rest)*
+                }
+            }
+            _ => {
+                ::core::compiler_error!("unsupported target");
+            }
         }
     };
-
-        // ::core::cfg_select! {
-        //     target_pointer_width = "16" => {
-        //         $crate::mem::layout::private::generate! {
-        //             $D;
-
-        //             bits: 16,
-        //             bits_minus_one: 15,
-
-        //             variants: enum {
-        //                 $( $_16, )+
-        //             },
-
-        //             $($_16_rest)*
-        //         }
-        //     }
-        //     target_pointer_width = "32" => {
-        //         $crate::mem::layout::private::generate! {
-        //             $D;
-
-        //             bits: 32,
-        //             bits_minus_one: 31,
-
-        //             variants: enum {
-        //                 $( $_16, )+
-        //                 $( $_32, )+
-        //             },
-
-        //             $($_32_rest)*
-        //         }
-        //     }
-        //     target_pointer_width = "64" => {
-        //         $crate::mem::layout::private::generate! {
-        //             $D;
-
-        //             bits: 64,
-        //             bits_minus_one: 63,
-
-        //             variants: enum {
-        //                 $( $_16, )+
-        //                 $( $_32, )+
-        //                 $( $_64, )+
-        //             },
-
-        //             $($_64_rest)*
-        //         }
-        //     }
-        //     _ => {
-        //         ::core::compiler_error!("unsupported target");
-        //     }
-        // }
-    // };
 }
 
 define! {
@@ -364,15 +338,13 @@ define! {
 
         align: {
             bounds: 0x0001..=0x8000,
-            docs: {},
         },
 
         mask: {
             bounds: 0x8000..=0xFFFF,
-            docs: {
-                without_hole: 0xFFF0,
-                with_hole:    0xF0F0,
-            },
+
+            without_hole: 0xFFF0,
+            with_hole:    0xF0F0,
         },
     },
 
@@ -384,15 +356,13 @@ define! {
 
         align: {
             bounds: 0x0000_0001..=0x8000_0000,
-            docs: {},
         },
 
         mask: {
             bounds: 0x8000_0000..=0xFFFF_FFFF,
-            docs: {
-                without_hole: 0xFFFF_0000,
-                with_hole:    0xFF0F_0000,
-            },
+
+            without_hole: 0xFFFF_0000,
+            with_hole:    0xFF0F_0000,
         },
     },
 
@@ -405,15 +375,13 @@ define! {
 
         align: {
             bounds: 0x0000_0000_0000_0001..=0x8000_0000_0000_0000,
-            docs: {},
         },
 
         mask: {
             bounds: 0x8000_0000_0000_0000..=0xFFFF_FFFF_FFFF_FFFF,
-            docs: {
-                without_hole: 0xFFFF_FFFF_0000_0000,
-                with_hole:    0xFFFF_FF0F_0000_0000,
-            },
+
+            without_hole: 0xFFFF_FFFF_0000_0000,
+            with_hole:    0xFFFF_FF0F_0000_0000,
         }
     },
 }
