@@ -33,12 +33,12 @@ pub mod arc;
 #[cfg(feature = "alloc")]
 pub mod rc;
 
-// Async stuff.
-#[cfg(all(feature = "tokio", feature = "futures"))]
-pub mod task;
-
 // Macros.
 pub mod macros;
+
+// Platform specific functionality.
+#[cfg(feature = "std")]
+pub mod platform;
 
 mod _docs {
     cfg_select! {

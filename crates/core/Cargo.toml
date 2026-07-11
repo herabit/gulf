@@ -12,16 +12,22 @@ categories.workspace = true
 publish.workspace = true
 
 [dependencies]
+bitflags = { workspace = true }
+bytes = { workspace = true, optional = true }
+libc = { workspace = true }
 tokio = { workspace = true, optional = true }
-futures = { workspace = true, optional = true }
+
+# [target.'cfg(target_os = "linux")'.dependencies]
+# linux-raw-sys = { workspace = true }
 
 [features]
-default = ["std", "tokio", "futures"]
+default = ["std", "tokio"]
 alloc = []
-std = ["alloc"]
+std = ["alloc", "bitflags/std", "libc/std"]
 
-tokio = ["dep:tokio", "std"]
-futures = ["dep:futures", "std"]
+bytes = ["dep:bytes", "std"]
+tokio = ["bytes", "dep:tokio", "std"]
+# futures = ["dep:futures", "std"]
 
 # These are private features.
 __generate = []

@@ -17,6 +17,7 @@ members = [
   "crates/capture",
   "crates/capture-linux",
   "crates/core",
+  "crates/core-linux",
   "crates/list"
 ]
 
@@ -78,6 +79,10 @@ libspa = {
   version = "0.10.0",
   default-features = false,
 }
+# linux-raw-sys = {
+#   version = "0.12.1",
+#   default-features = false,
+# }
 log = {
   version = "0.4.33",
   default-features = false,
@@ -135,7 +140,19 @@ winit = {
   default-features = false,
 }
 
-[workspace.lints]
+# [workspace.lints]
+
+[workspace.lints.clippy]
+cast_possible_truncation = "warn"
+cast_ptr_alignment = "warn"
+cast_sign_loss = "warn"
+cast_slice_different_sizes = "warn"
+inline_trait_bounds = "warn"
+
+[workspace.lints.rust]
+# fuzzy_provenance_casts = "deny"
+# lossy_provenance_casts = "deny"
+let_underscore_drop = "warn"
 
 [dependencies]
 

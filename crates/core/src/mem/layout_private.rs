@@ -1,4 +1,4 @@
-///! Private implementation details for the layout types.
+//! Private implementation details for the layout types.
 use core::cmp::Ordering;
 
 /// Returns whether or not the given value has any holes (discontinuous sequences of bits).
@@ -114,6 +114,7 @@ macro_rules! generate {
             ::core::cmp::Eq,
         )]
         #[repr(usize)]
+        #[allow(clippy::enum_clike_unportable_variant)]
         pub(crate) enum AlignRepr {
             $(
                 $variant = 1_usize.strict_shl(Index::$variant as u32),
@@ -140,6 +141,7 @@ macro_rules! generate {
             ::core::cmp::Eq,
         )]
         #[repr(usize)]
+        #[allow(clippy::enum_clike_unportable_variant)]
         pub(crate) enum MaskRepr {
             $(
                 $variant = !(AlignRepr::$variant as usize).strict_sub(1),

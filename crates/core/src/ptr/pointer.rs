@@ -1,4 +1,4 @@
-use core::{error, fmt, hash, num::NonZero, ptr::NonNull};
+use core::{fmt, hash, num::NonZero, ptr::NonNull};
 use std::mem;
 
 use crate::ptr::{CastMetadata, Pointee, cast_metadata};
