@@ -77,7 +77,9 @@ impl<'a> SelectSources<'a> {
             None => {
                 let available_modes = proxy.available_cursor_modes().await?;
 
-                cache.map(|cache| cache.store(available_modes.bits(), Ordering::Release));
+                if let Some(cache) = cache {
+                    cache.store(available_modes.bits(), Ordering::Release);
+                }
 
                 available_modes
             }
@@ -283,7 +285,6 @@ pub struct SelectedSourcesIter<'a> {
 impl<'a> SelectedSourcesIter<'a> {
     /// Get the inner parts of this iterator.
     #[inline(always)]
-    #[must_use]
     pub fn into_inner(self) -> (&'a SelectedSources, slice::Iter<'a, Stream>) {
         (self.selected_sources, self.iter)
     }
@@ -592,7 +593,6 @@ where
 
     /// Attempt to clone the source.
     #[inline(always)]
-    #[must_use]
     #[track_caller]
     pub fn to_owned(&self) -> std::io::Result<SelectedSource<Stream, OwnedFd>> {
         Ok(SelectedSource {
@@ -632,6 +632,7 @@ async fn fuck() {
     }
 }
 
+#[allow(unused)]
 pub fn stream_inner(
     stream_info: Stream,
     pipewire_remote: OwnedFd,

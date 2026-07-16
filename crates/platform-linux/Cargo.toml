@@ -1,5 +1,5 @@
 [package]
-name = "gulf-core-linux"
+name = "gulf-platform-linux"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -12,12 +12,20 @@ categories.workspace = true
 publish.workspace = true
 
 [dependencies]
+bitflags = { workspace = true }
+gulf-core = { path = "../core/" }
 libc = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true, optional = true }
+# tinyvec = { workspace = true }
 
 [features]
-default = ["std"]
+default = ["tokio"]
+
 alloc = []
-std = ["alloc", "libc/std"]
+std = ["alloc", "bitflags/std", "gulf-core/std", "libc/std", "log/std"]
+
+tokio = ["dep:tokio", "std"]
 
 [lints]
 workspace = true

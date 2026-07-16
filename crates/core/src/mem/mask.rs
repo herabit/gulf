@@ -50,11 +50,13 @@ const _: () = assert!(
 //
 //       Do not remove these.
 const _: () = assert!(
-    Mask::MIN.repr as usize == get!(mask.min),
+    Mask::MIN.repr as usize == get!(mask.min)
+        && Mask::MIN.repr as usize == Align::MAX.mask().repr as usize,
     get!(mask.min.assert),
 );
 const _: () = assert!(
-    Mask::MAX.repr as usize == get!(mask.max),
+    Mask::MAX.repr as usize == get!(mask.max)
+        && Mask::MAX.repr as usize == Align::MIN.mask().repr as usize,
     get!(mask.max.assert),
 );
 
@@ -72,6 +74,24 @@ const _: () = assert!(
 );
 
 impl Mask {
+    // /// The smallest possible mask that is supported, which is the bitmask
+    // /// of [`Align::MAX`]
+    // #[doc = concat!(
+    //     "(",
+    //     get!(mask.min),
+    //     " on ",
+    //     get!(bits),
+    //     "-bit platforms).",
+    // )]
+    // ///
+    // /// # Examples
+    // ///
+    // /// ```
+    // /// # use gulf_core::mem::Mask;
+    // /// #
+    // #[doc = concat!(
+    //     "// W"
+    // )]
     pub const MIN: Mask = Mask {
         repr: MaskRepr::MIN,
     };
@@ -94,6 +114,7 @@ impl Mask {
             let _ = unsafe { Align::new_unchecked((!mask.get()).unchecked_add(1)) };
 
             // SAFETY: See above.
+            #[allow(clippy::missing_transmute_annotations)]
             Some(unsafe { mem::transmute(mask) })
         } else {
             None

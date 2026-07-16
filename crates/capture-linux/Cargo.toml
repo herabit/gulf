@@ -24,6 +24,9 @@ gulf-core = {
   path = "../core/",
   default-features = true,
 }
+gulf-platform-linux = {
+  path = "../platform-linux/",
+}
 libc = {
   workspace = true,
 }
@@ -35,13 +38,16 @@ log = {
   workspace = true,
   features = ["std"],
 }
+parking_lot = {
+  workspace = true,
+}
 pipewire = {
   workspace = true,
   features = ["v1_2_0"],
 }
 tokio = {
   workspace = true,
-  features = ["macros", "sync"],
+  features = ["macros", "net", "sync"],
 }
 
 [lints]

@@ -1,8 +1,6 @@
 use std::{
     io::{Error, ErrorKind},
-    num::NonZero,
-    os::fd::{AsRawFd, BorrowedFd, OwnedFd},
-    ptr::{self, NonNull},
+    os::fd::OwnedFd,
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
@@ -22,7 +20,7 @@ pub fn page_size() -> std::io::Result<Align> {
         Some(page_size) => Ok(page_size),
         None => {
             let page_size = Ok(unsafe { libc::sysconf(_SC_PAGESIZE) })
-                .and_then(|page_size| usize::try_from(page_size))
+                .and_then(usize::try_from)
                 .map_err(|_| Error::last_os_error())
                 .and_then(|page_size| {
                     Align::try_from(page_size).map_err(|_| {

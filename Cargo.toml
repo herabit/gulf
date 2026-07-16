@@ -17,8 +17,8 @@ members = [
   "crates/capture",
   "crates/capture-linux",
   "crates/core",
-  "crates/core-linux",
-  "crates/list"
+  "crates/list",
+  "crates/platform-linux",
 ]
 
 [workspace.package]
@@ -87,6 +87,10 @@ log = {
   version = "0.4.33",
   default-features = false,
 }
+parking_lot = {
+  version = "0.12.5",
+  default-features = false,
+}
 pipewire = {
   version = "0.10.0",
   default-features = false,
@@ -101,6 +105,10 @@ raw-window-handle = {
 }
 syn = {
   version = "2.0.118",
+  default-features = false,
+}
+tinyvec = {
+  version = "1.12.0",
   default-features = false,
 }
 tokio = {
@@ -148,6 +156,9 @@ cast_ptr_alignment = "warn"
 cast_sign_loss = "warn"
 cast_slice_different_sizes = "warn"
 inline_trait_bounds = "warn"
+manual_map = "allow"
+needless_lifetimes = "allow"
+useless_conversion = "allow"
 
 [workspace.lints.rust]
 # fuzzy_provenance_casts = "deny"

@@ -118,18 +118,29 @@ impl Align {
         repr: AlignRepr::MAX,
     };
 
+    /// Create an [`Align`] from a non-zero [`usize`].
+    ///
+    /// # Returns
+    ///
+    /// Returns [`None`] if `align` is not a power-of-two.
     #[inline(always)]
     #[track_caller]
     #[must_use]
     pub const fn from_nonzero(align: NonZero<usize>) -> Option<Align> {
         if align.is_power_of_two() {
             // SAFETY: We know `align` is a power-of-two.
+            #[allow(clippy::missing_transmute_annotations)]
             Some(unsafe { mem::transmute(align) })
         } else {
             None
         }
     }
 
+    /// Create an [`Align`] from a non-zero [`usize`] without any checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure `align` is a power-of-two.
     #[inline(always)]
     #[must_use]
     #[track_caller]
@@ -141,18 +152,29 @@ impl Align {
         unsafe { mem::transmute(align) }
     }
 
+    /// Create an [`Align`] from a [`usize`].
+    ///
+    /// # Returns
+    ///
+    /// Returns [`None`] if `align` is not a power-of-two.
     #[inline(always)]
     #[track_caller]
     #[must_use]
     pub const fn new(align: usize) -> Option<Align> {
         if align.is_power_of_two() {
             // SAFETY: We know `align` is a power-of-two.
+            #[allow(clippy::missing_transmute_annotations)]
             Some(unsafe { mem::transmute(align) })
         } else {
             None
         }
     }
 
+    /// Create an [`Align`] from a [`usize`] without any checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure `align` is a power-of-two.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -164,6 +186,7 @@ impl Align {
         unsafe { mem::transmute(align) }
     }
 
+    /// Get the [`Align`] of some [`Layout`].
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -172,6 +195,7 @@ impl Align {
         unsafe { Align::new_unchecked(layout.align()) }
     }
 
+    /// Get the alignment of a non-zero memory address.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -181,6 +205,11 @@ impl Align {
         Align::new(align).unwrap()
     }
 
+    /// Get the alignment of a memory address.
+    ///
+    /// # Returns
+    ///
+    /// Returns [`None`] if the address is null.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -191,6 +220,7 @@ impl Align {
         }
     }
 
+    /// Get the alignment of the type `T`.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -201,6 +231,9 @@ impl Align {
         }
     }
 
+    /// Get the alignment of `val`. This is *not* the alignment of the memory address for `val`.
+    ///
+    /// If you need to get the alignment of the address, use [`Align::from_addr`] or [`Align::from_addr_nonzero`].
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -212,6 +245,7 @@ impl Align {
         unsafe { Align::new_unchecked(align_of_val(val)) }
     }
 
+    /// Get this alignment as a non-zero [`usize`].
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -225,6 +259,7 @@ impl Align {
         align
     }
 
+    /// Get this alignment as a [`usize`].
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -232,6 +267,7 @@ impl Align {
         self.get_nonzero().get()
     }
 
+    /// Calculate the [`Mask`] for this alignment.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -239,6 +275,7 @@ impl Align {
         Mask::from_align(self)
     }
 
+    /// Calculate the base-two logarithm of this alignment.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -246,6 +283,7 @@ impl Align {
         self.get_nonzero().trailing_zeros()
     }
 
+    //// Calculate the alignment for a [`Mask`].
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -253,6 +291,8 @@ impl Align {
         mask.align()
     }
 
+    /// Create a dangling pointer that is sufficiently aligned to
+    /// this alignment.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -260,9 +300,9 @@ impl Align {
         NonNull::without_provenance(self.get_nonzero())
     }
 
+    /// Create a [`Layout`] for this alignment and some size.
     #[inline(always)]
     #[track_caller]
-    #[must_use]
     pub const fn layout_with_size(
         self,
         size: usize,
@@ -270,6 +310,12 @@ impl Align {
         Layout::from_size_align(size, self.get())
     }
 
+    /// Round up some size to some multiple of this alignment.
+    ///
+    /// # Returns
+    ///
+    /// Returns [`None`] if rounding up the size to be some multiple of `self`
+    /// overflows.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -281,9 +327,16 @@ impl Align {
         //       we mask off the bits that'd be set upon overflow after.
         let new_size = size.wrapping_add(self.get().strict_sub(1)) & self.mask().get();
 
+        // NOTE: Since the result on overflow is zero, this never panics on the overflow case.
+        assert!(
+            new_size.is_multiple_of(self.get()),
+            "size is not a multiple of the alignment",
+        );
+
         NonZero::new(new_size)
     }
 
+    /// Calculate the maximum size for this alignment.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -291,6 +344,7 @@ impl Align {
         Align::MAX.get().strict_sub(self.get())
     }
 
+    /// Perform [`Ord::cmp`] in a `const`-friendly manner.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -301,6 +355,7 @@ impl Align {
         compare(self.get(), rhs.get())
     }
 
+    /// Perform [`Ord::min`] in a `const`-friendly manner.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -312,6 +367,7 @@ impl Align {
         unsafe { Align::new_unchecked(min(self.get(), other.get())) }
     }
 
+    /// Perform [`Ord::max`] in a `const`-friendly manner.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -323,6 +379,7 @@ impl Align {
         unsafe { Align::new_unchecked(max(self.get(), other.get())) }
     }
 
+    /// Perform [`Ord::clamp`] in a `const`-friendly manner.
     #[inline(always)]
     #[track_caller]
     #[must_use]
@@ -486,6 +543,7 @@ impl Default for Align {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for Align {
     #[inline(always)]
     fn partial_cmp(
@@ -534,18 +592,22 @@ impl Ord for Align {
 
 impl hash::Hash for Align {
     #[inline(always)]
-    fn hash<H: hash::Hasher>(
+    fn hash<H>(
         &self,
         state: &mut H,
-    ) {
+    ) where
+        H: hash::Hasher,
+    {
         state.write_usize(self.get());
     }
 
     #[inline(always)]
-    fn hash_slice<H: hash::Hasher>(
+    fn hash_slice<H>(
         data: &[Self],
         state: &mut H,
-    ) {
+    ) where
+        H: hash::Hasher,
+    {
         // SAFETY: `Align`s are just `usize`s in disguise.
         let data = unsafe { (&raw const *data as *const [usize]).as_ref_unchecked() };
 

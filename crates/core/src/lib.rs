@@ -36,9 +36,12 @@ pub mod rc;
 // Macros.
 pub mod macros;
 
-// Platform specific functionality.
-#[cfg(feature = "std")]
-pub mod platform;
+// Type level stuff.
+pub mod ty;
+
+// // Platform specific functionality.
+// #[cfg(feature = "std")]
+// pub mod platform;
 
 mod _docs {
     cfg_select! {

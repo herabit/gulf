@@ -36,6 +36,7 @@ impl PowerOfTwo {
 
         match exponent {
             // SAFETY: `PowerOfTwo` is guaranteed to be represented as a `u8` in the range `MIN..=MAX`.
+            #[allow(clippy::missing_transmute_annotations)]
             exponent @ MIN..=MAX => Some(unsafe { mem::transmute(exponent) }),
             _ => None,
         }
@@ -135,19 +136,22 @@ impl Ord for PowerOfTwo {
 
 impl hash::Hash for PowerOfTwo {
     #[inline(always)]
-    fn hash<H: hash::Hasher>(
+    fn hash<H>(
         &self,
         state: &mut H,
-    ) {
+    ) where
+        H: hash::Hasher,
+    {
         self.to_exponent().hash(state);
     }
 
     #[inline(always)]
-    fn hash_slice<H: hash::Hasher>(
+    fn hash_slice<H>(
         data: &[Self],
         state: &mut H,
     ) where
         Self: Sized,
+        H: hash::Hasher,
     {
         // SAFETY: `PowerOfTwo` instances are all just `u8`s, so reinterpreting them as such is safe.
         let data = unsafe { (&raw const *data as *const [u8]).as_ref_unchecked() };
