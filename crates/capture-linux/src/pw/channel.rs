@@ -384,15 +384,15 @@ impl<T> Sender<T> {
     }
 }
 
-#[unsafe(no_mangle)]
-pub fn lol(
-    a: &mut Sender<String>,
-    b: String,
-) -> () {
-    use std::pin::{Pin, pin};
-    use std::task::{Context, Waker};
-    let fut = pin!(a.send_one_async(b, None)).poll(&mut Context::from_waker(Waker::noop()));
-}
+// #[unsafe(no_mangle)]
+// pub fn lol(
+//     a: &mut Sender<String>,
+//     b: String,
+// ) -> () {
+//     use std::pin::{Pin, pin};
+//     use std::task::{Context, Waker};
+//     let fut = pin!(a.send_one_async(b, None)).poll(&mut Context::from_waker(Waker::noop()));
+// }
 
 impl<T> AsFd for Sender<T> {
     #[inline(always)]

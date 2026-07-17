@@ -113,7 +113,7 @@ pub fn abort() -> ! {
     }
 }
 
-#[unsafe(no_mangle)]
-const fn lol(c: *const [u8]) -> *const str {
-    ptr::cast(c)
-}
+// #[unsafe(no_mangle)]
+// const fn lol(c: *const [u8]) -> *const str {
+//     ptr::cast(c)
+// }
