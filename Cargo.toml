@@ -92,6 +92,7 @@ log = {
 parking_lot = {
   version = "0.12.5",
   default-features = false,
+  features = ["deadlock_detection"]
 }
 pipewire = {
   version = "0.10.0",
