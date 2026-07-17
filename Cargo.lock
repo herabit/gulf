@@ -30,7 +30,7 @@ checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
 [[package]]
 name = "ashpd"
 version = "0.13.0"
-source = "git+https://github.com/bilelmoussaoui/ashpd.git?rev=1f195de2a0ca56531a5e79df0682a12e9883a4c9#1f195de2a0ca56531a5e79df0682a12e9883a4c9"
+source = "git+https://github.com/bilelmoussaoui/ashpd.git?rev=7911df59d0de6b40c77d26c1d0915667fce2c622#7911df59d0de6b40c77d26c1d0915667fce2c622"
 dependencies = [
  "enumflags2",
  "futures-channel",

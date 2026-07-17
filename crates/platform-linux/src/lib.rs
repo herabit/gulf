@@ -8,6 +8,8 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+#[cfg(feature = "std")]
+pub mod atomic_fd;
 pub mod dma_buf;
 pub mod errno;
-pub mod memfd;
+pub mod mem_fd;

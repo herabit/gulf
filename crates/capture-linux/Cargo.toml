@@ -47,7 +47,7 @@ pipewire = {
 }
 tokio = {
   workspace = true,
-  features = ["macros", "net", "sync"],
+  features = ["macros", "net", "sync", "time"],
 }
 
 [lints]
