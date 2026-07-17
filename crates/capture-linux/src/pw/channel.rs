@@ -67,6 +67,8 @@ impl<T> Sender<T> {
         I: IntoIterator<Item = T>,
     {
         if !self.has_receiver() {
+            hint::cold_path();
+
             return Err(SendError::Closed(Some(iter)));
         }
 
@@ -148,6 +150,14 @@ impl<T> Sender<T> {
                                 Errno(libc::EINTR) => {
                                     // NOTE: We want the parent future to run before we try reading again.
                                     yield_now().await;
+
+                                    // NOTE: We're done yielding control, so now we need to ensure we
+                                    //       haven't timed out in the interim.
+                                    if start.elapsed() >= duration {
+                                        hint::cold_path();
+
+                                        return Err(SendError::TimedOut(iter));
+                                    }
 
                                     continue 'write;
                                 }
