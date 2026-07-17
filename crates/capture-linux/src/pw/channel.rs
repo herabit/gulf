@@ -66,6 +66,7 @@ impl<T> Sender<T> {
     where
         I: IntoIterator<Item = T>,
     {
+        // NOTE: Fast path!
         if !self.has_receiver() {
             hint::cold_path();
 
@@ -76,6 +77,7 @@ impl<T> Sender<T> {
             Ok(fd) => fd,
             Err(error) => {
                 hint::cold_path();
+
                 return Err(SendError::Other(Some(iter), error));
             }
         };
